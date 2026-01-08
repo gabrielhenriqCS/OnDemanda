@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Usuario {
+  id     Int    @id @default(autoincrement())
+  nome   String
+  email  String @unique
+  senha  String
+  funcao Role
+}
+
+model Mesa {
+  id           Int        @id @default(autoincrement())
+  mesa         Int
+  cliente      String?
+  status       StatusMesa @default(LIVRE)
+  criadoEm     DateTime   @default(now())
+  atualizadoEm DateTime   @updatedAt
+  Comanda      Comanda[]
+}
+
+model Produto {
+  id        Int     @id @default(autoincrement())
+  nome      String
+  descricao String?
+  preco     Float
+  categoria String?
+
+  criadoEm     DateTime     @default(now())
+  atualizadoEm DateTime     @updatedAt
+  Pedido       ItemPedido[]
+}
+
+model ItemPedido {
+  id       Int    @id @default(autoincrement())
+  pedidoId Int
+  pedido   Pedido @relation(fields: [pedidoId], references: [id])
+
+  produtoId Int
+  produto   Produto @relation(fields: [produtoId], references: [id])
+
+  quantidade Int
+  observacao String?
+
+  precoUnitario Float
+  precoTotal    Float
+}
+
+model Comanda {
+  id           Int           @id @default(autoincrement())
+  cliente      String?
+  mesaId       Int
+  mesa         Mesa          @relation(fields: [mesaId], references: [id])
+  pedidos      Pedido[]
+  status       StatusComanda @default(ABERTA) // aberta | fechada
+  criadoEm     DateTime      @default(now())
+  atualizadoEm DateTime      @updatedAt
+}
+
+model Pedido {
+  id           Int          @id @default(autoincrement())
+  comandaId    Int
+  comanda      Comanda      @relation(fields: [comandaId], references: [id])
+  itens        ItemPedido[]
+  status       StatusPedido @default(PREPARANDO) // pendente | pronto | entregue
+  criadoEm     DateTime     @default(now())
+  atualizadoEm DateTime     @updatedAt
+}
+
+enum Role {
+  ADMIN
+  GARCOM
+  ATENDENTE
+}
+
+enum StatusPedido {
+  PREPARANDO
+  PRONTO
+  ENTREGUE
+}
+
+enum StatusComanda {
+  ABERTA
+  FECHADA
+}
+
+enum StatusMesa {
+  OCUPADA
+  LIVRE
+}
