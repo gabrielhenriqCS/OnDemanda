@@ -30,9 +30,9 @@ export default function Login() {
 
       localStorage.setItem("token", data.token_acesso);
 
-      if (data.funcao === "ADMIN") navigate("/admin/dashboard");
-      if (data.funcao === "GARCOM") navigate("/comanda");
-      if (data.funcao === "COZINHA") navigate("/cozinha");
+      if (data.funcao === "admin") navigate("/admin/dashboard");
+      if (data.funcao === "garcom") navigate("/comanda");
+      if (data.funcao === "cozinha") navigate("/cozinha");
     } catch (e: unknown) {
       console.error("Erro nas credenciais ao fazer login: ", e);
     }
@@ -53,9 +53,9 @@ export default function Login() {
           value={funcao}
           onChange={(e) => setFuncao(e.target.value)}
         >
-          <option value="GARCOM">Garçom</option>
-          <option value="COZINHA">Cozinha</option>
-          <option value="ADMIN">Administrador</option>
+          <option value="garcom">Garçom</option>
+          <option value="cozinha">Cozinha</option>
+          <option value="admin">Administrador</option>
         </select>
         <label htmlFor="email" className="text-[21px] my-2">
           E-mail

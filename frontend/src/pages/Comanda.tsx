@@ -17,12 +17,12 @@ export default function Comanda() {
     carregarMesas();
   }, []);
   return (
-    <section>
-      <h1>Comanda</h1>
-      <input type="text" placeholder="Digite o n° da mesa..." />
+    <section className="flex flex-col items-center mt-10">
+      <h1 className="text-[30px]">Comanda</h1>
+      <input type="text" placeholder="Pesquise com o n° da mesa..." className="m-5 p-3 w-[55rem] bg-gray-300 text-[20px] rounded-lg"/>
 
-      <h2>Mesas livres</h2>
-        <div>
+      <h2 className="text-[20px] mt-2">Mesas livres</h2>
+        <div className="">
               {comandas.length === 0 ? (
                   <p>Nenhuma comanda encontrada</p>
               ) : (

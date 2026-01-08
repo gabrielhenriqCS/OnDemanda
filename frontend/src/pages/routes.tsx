@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-// import Login from './Login'
+import Login from './Login'
 import Comanda from './Comanda'
 import Cozinha from './Cozinha'
 import Dashboard from './Admin/Dashboard'
@@ -10,7 +10,7 @@ export default function Navigation() {
         <BrowserRouter>
             <Routes>
                 <Route index element={
-                    <Comanda />
+                    <Login />
                 } />
                 <Route path='/comanda' element={
                     <Layout>
