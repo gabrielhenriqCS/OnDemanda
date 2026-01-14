@@ -1,4 +1,3 @@
-// src/mesas/mesas.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMesaDTO } from './DTOs/create-mesa.dto';
@@ -9,7 +8,12 @@ export class MesasService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(dto: CreateMesaDTO) {
-    return this.prisma.mesa.create({ data: dto });
+    return this.prisma.mesa.create({
+      data: {
+        ...dto,
+        atualizadoEm: new Date(),
+      },
+    });
   }
 
   findAll() {

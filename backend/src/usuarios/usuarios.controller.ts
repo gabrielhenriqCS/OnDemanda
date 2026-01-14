@@ -14,10 +14,6 @@ import {
 import { UsuariosService } from './usuarios.service';
 import { CreateUsuarioDTO } from './DTOs/create-usuario.dto';
 import { UpdateUsuarioDTO } from './DTOs/update-usuario.dto';
-import { Role } from '@prisma/client';
-import { Roles } from 'src/auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-
 @Controller('usuarios')
 export class UsuariosController {
   constructor(private readonly usuariosService: UsuariosService) {}
@@ -36,8 +32,6 @@ export class UsuariosController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
   create(@Body() usuarioDto: CreateUsuarioDTO) {
     return this.usuariosService.criarUsuario(usuarioDto);
   }
@@ -50,16 +44,12 @@ export class UsuariosController {
 
   @HttpCode(HttpStatus.OK)
   @Put(':email')
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
   update(@Param('email') email: string, @Body() data: UpdateUsuarioDTO) {
     return this.usuariosService.atualizarUsuario(email, data);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':email')
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
   delete(@Param('email') email: string) {
     return this.usuariosService.deletarUsuario(email);
   }

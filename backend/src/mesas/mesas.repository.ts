@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { Mesa, Prisma } from '@prisma/client';
+import { mesa, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class MesasRepository {
   constructor(private prisma: PrismaService) {}
 
-  create(data: Prisma.MesaCreateInput) {
+  create(data: Prisma.mesaCreateInput) {
     return this.prisma.mesa.create({ data });
   }
 
@@ -19,9 +19,9 @@ export class MesasRepository {
   }
 
   update(params: {
-    where: Prisma.MesaWhereUniqueInput;
-    data: Prisma.MesaUpdateInput;
-  }): Promise<Mesa> {
+    where: Prisma.mesaWhereUniqueInput;
+    data: Prisma.mesaUpdateInput;
+  }): Promise<mesa> {
     const { where, data } = params;
     return this.prisma.mesa.update({
       data,

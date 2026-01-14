@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,90 +6,93 @@ datasource db {
   provider = "mysql"
 }
 
-model Usuario {
-  id     Int    @id @default(autoincrement())
-  nome   String
-  email  String @unique
-  senha  String
-  funcao Role
-}
-
-model Mesa {
-  id           Int        @id @default(autoincrement())
-  mesa         Int
-  cliente      String?
-  status       StatusMesa @default(LIVRE)
-  criadoEm     DateTime   @default(now())
-  atualizadoEm DateTime   @updatedAt
-  Comanda      Comanda[]
-}
-
-model Produto {
-  id        Int     @id @default(autoincrement())
-  nome      String
-  descricao String?
-  preco     Float
-  categoria String?
-
-  criadoEm     DateTime     @default(now())
-  atualizadoEm DateTime     @updatedAt
-  Pedido       ItemPedido[]
-}
-
-model ItemPedido {
-  id       Int    @id @default(autoincrement())
-  pedidoId Int
-  pedido   Pedido @relation(fields: [pedidoId], references: [id])
-
-  produtoId Int
-  produto   Produto @relation(fields: [produtoId], references: [id])
-
-  quantidade Int
-  observacao String?
-
-  precoUnitario Float
-  precoTotal    Float
-}
-
-model Comanda {
-  id           Int           @id @default(autoincrement())
+model comanda {
+  id           Int            @id @default(autoincrement())
   cliente      String?
   mesaId       Int
-  mesa         Mesa          @relation(fields: [mesaId], references: [id])
-  pedidos      Pedido[]
-  status       StatusComanda @default(ABERTA) // aberta | fechada
-  criadoEm     DateTime      @default(now())
-  atualizadoEm DateTime      @updatedAt
+  status       comanda_status @default(ABERTA)
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime
+  mesa         mesa           @relation(fields: [mesaId], references: [id], map: "Comanda_mesaId_fkey")
+  pedido       pedido[]
+
+  @@index([mesaId], map: "Comanda_mesaId_fkey")
 }
 
-model Pedido {
-  id           Int          @id @default(autoincrement())
+model itempedido {
+  id            Int     @id @default(autoincrement())
+  pedidoId      Int
+  produtoId     Int
+  quantidade    Int
+  observacao    String?
+  precoUnitario Float
+  precoTotal    Float
+  pedido        pedido  @relation(fields: [pedidoId], references: [id], map: "ItemPedido_pedidoId_fkey")
+  produto       produto @relation(fields: [produtoId], references: [id], map: "ItemPedido_produtoId_fkey")
+
+  @@index([pedidoId], map: "ItemPedido_pedidoId_fkey")
+  @@index([produtoId], map: "ItemPedido_produtoId_fkey")
+}
+
+model mesa {
+  id           Int         @id @default(autoincrement())
+  status       mesa_status @default(LIVRE)
+  criadoEm     DateTime    @default(now())
+  atualizadoEm DateTime
+  cliente      String?
+  mesa         Int
+  comanda      comanda[]
+}
+
+model pedido {
+  id           Int           @id @default(autoincrement())
   comandaId    Int
-  comanda      Comanda      @relation(fields: [comandaId], references: [id])
-  itens        ItemPedido[]
-  status       StatusPedido @default(PREPARANDO) // pendente | pronto | entregue
+  status       pedido_status @default(PREPARANDO)
+  criadoEm     DateTime      @default(now())
+  atualizadoEm DateTime
+  itempedido   itempedido[]
+  comanda      comanda       @relation(fields: [comandaId], references: [id], map: "Pedido_comandaId_fkey")
+
+  @@index([comandaId], map: "Pedido_comandaId_fkey")
+}
+
+model produto {
+  id           Int          @id @default(autoincrement())
+  nome         String
+  descricao    String?
+  preco        Float
+  categoria    String?
   criadoEm     DateTime     @default(now())
-  atualizadoEm DateTime     @updatedAt
+  atualizadoEm DateTime
+  itempedido   itempedido[]
 }
 
-enum Role {
-  ADMIN
-  GARCOM
-  ATENDENTE
+model usuario {
+  id     Int            @id @default(autoincrement())
+  nome   String
+  email  String         @unique(map: "Usuario_email_key")
+  senha  String
+  funcao usuario_funcao
 }
 
-enum StatusPedido {
+enum mesa_status {
+  OCUPADA
+  LIVRE
+}
+
+enum pedido_status {
   PREPARANDO
   PRONTO
   ENTREGUE
 }
 
-enum StatusComanda {
+enum comanda_status {
   ABERTA
   FECHADA
 }
 
-enum StatusMesa {
-  OCUPADA
-  LIVRE
+enum usuario_funcao {
+  ADMIN
+  GARCOM
+  ATENDENTE
 }

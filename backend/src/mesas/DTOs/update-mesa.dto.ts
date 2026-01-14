@@ -1,9 +1,9 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { CreateMesaDTO } from "./create-mesa.dto";
 import { IsEnum } from "class-validator";
-import { StatusMesa } from "@prisma/client";
+import { mesa_status } from "@prisma/client";
 
 export class UpdateMesaDTO extends PartialType(CreateMesaDTO) {
-    @IsEnum(StatusMesa)
-    status?: StatusMesa
+    @IsEnum(mesa_status)
+    status?: mesa_status
 }

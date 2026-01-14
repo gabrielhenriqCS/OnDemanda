@@ -1,35 +1,29 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { ProdutoModule } from './produtos/produto.module'
-import { PrismaModule } from './prisma/prisma.module';
+import { ProdutoModule } from './produtos/produto.module';
 import { AuthModule } from './auth/auth.module';
-
 import { MesasModule } from './mesas/mesas.module';
 import { ComandaModule } from './comanda/comanda.module';
 import { PedidosModule } from './pedidos/pedidos.module';
-import { APP_GUARD, APP_PIPE } from '@nestjs/core';
-import { AuthGuard } from './auth/auth.guard';
-import { RolesGuard } from './auth/roles.guard';
+import { APP_PIPE } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-
+import { PrismaModule } from './prisma/prisma.module';
 @Module({
-  imports: [ProdutoModule, PrismaModule, AuthModule, MesasModule, ComandaModule, PedidosModule,
+  imports: [
     ConfigModule.forRoot({
-    isGlobal: true,
-  }),
+      isGlobal: true,
+    }),
+    ProdutoModule,
+    PrismaModule,
+    AuthModule,
+    MesasModule,
+    ComandaModule,
+    PedidosModule,
   ],
   providers: [
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
     },
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    }
   ],
 })
 export class AppModule {}

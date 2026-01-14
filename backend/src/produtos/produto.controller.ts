@@ -14,10 +14,8 @@ import {
 import { ProdutoService } from './produto.service';
 import { CreateProdutoDTO } from './DTOs/create-produto.dto';
 import { UpdateProdutoDTO } from './DTOs/update-produto.dto';
-import { Public } from 'src/auth/public.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from '@prisma/client';
+import { Public } from 'src/auth/decorators/public.decorator';
+
 
 @Controller('produto')
 export class ProdutoController {
@@ -39,16 +37,12 @@ export class ProdutoController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
   create(@Body() data: CreateProdutoDTO) {
     return this.produtoService.criarProduto(data);
   }
 
   @HttpCode(HttpStatus.OK)
   @Put(':id')
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateProdutoDTO,
@@ -58,8 +52,6 @@ export class ProdutoController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.produtoService.deletarProduto(id);
   }

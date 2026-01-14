@@ -5,7 +5,7 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-import { Role } from '@prisma/client';
+import { usuario_funcao } from '@prisma/client';
 
 export class CreateUsuarioDTO {
   
@@ -26,6 +26,6 @@ export class CreateUsuarioDTO {
 
   
   @IsNotEmpty()
-  @IsEnum(Role)
-  funcao: Role;
+  @IsEnum(usuario_funcao)
+  funcao: usuario_funcao;
 }

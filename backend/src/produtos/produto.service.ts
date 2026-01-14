@@ -7,8 +7,11 @@ import { UpdateProdutoDTO } from './DTOs/update-produto.dto';
 export class ProdutoService {
   constructor(private readonly produtoRepo: ProdutoRepository) {}
 
-  criarProduto(data: CreateProdutoDTO) {
-    return this.produtoRepo.create(data);
+  criarProduto(dto: CreateProdutoDTO) {
+    return this.produtoRepo.create({
+      ...dto,
+      atualizadoEm: new Date()
+    });
   }
 
   listarProdutos() {

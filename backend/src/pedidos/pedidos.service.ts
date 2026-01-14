@@ -1,4 +1,4 @@
-// src/pedidos/pedidos.service.ts
+
 import {
   Injectable,
   NotFoundException,
@@ -12,12 +12,10 @@ export class PedidosService {
   constructor(private prisma: PrismaService) {}
 
   async abrirPedido(dto: CreatePedidoDTO) {
-    // valida comanda
     const comanda = await this.prisma.comanda.findUnique({ where: { id: dto.comandaId } });
     if (!comanda) throw new NotFoundException('Comanda não encontrada');
     if (comanda.status === 'FECHADA') throw new BadRequestException('Comanda fechada');
 
-    // valida produtos e calcula preços se necessário
     for (const item of dto.itens) {
       const produto = await this.prisma.produto.findUnique({ where: { id: item.produtoId } });
       if (!produto) throw new NotFoundException(`Produto ${item.produtoId} não encontrado`);
@@ -25,39 +23,39 @@ export class PedidosService {
       if (!item.precoTotal) item.precoTotal = item.precoUnitario * item.quantidade;
     }
 
-    // cria pedido com itens (transação implícita by prisma create include)
-    const pedido = await this.prisma.pedido.create({
+    return await this.prisma.pedido.create({
       data: {
         comanda: { connect: { id: dto.comandaId } },
-        // se usar ItemPedido model
-        itens: {
+        itempedido: {
           create: dto.itens.map(i => ({
             produto: { connect: { id: i.produtoId } },
             quantidade: i.quantidade,
             observacao: i.observacao,
             precoUnitario: i.precoUnitario,
             precoTotal: i.precoTotal,
-          })),
+          }))
         },
+        atualizadoEm: new Date('dd/MM/yyyy HH:MM'),
       },
-      include: { itens: { include: { produto: true } } },
-    });
-
-    // opcional: atualizar updatedAt da comanda (Prisma já faz)
-    return pedido;
+      include: {
+        itempedido: {
+          include: { produto: true }
+        }
+      }
+    })
   }
 
   mostrarPedidos() {
     return this.prisma.pedido.findMany({
       where: { status: 'PREPARANDO' },
-      include: { itens: { include: { produto: true } }, comanda: { include: { mesa: true } } },
+      include: { itempedido: { include: { produto: true } }, comanda: { include: { mesa: true } } },
     });
   }
 
   encontrarPedido(id: number) {
     return this.prisma.pedido.findUnique({
       where: { id },
-      include: { itens: { include: { produto: true } }, comanda: true },
+      include: { itempedido: { include: { produto: true } }, comanda: true },
     });
   }
 

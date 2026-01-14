@@ -1,4 +1,4 @@
-import { StatusMesa } from "@prisma/client";
+import { mesa_status } from "@prisma/client";
 import { IsEnum, IsNumber, IsString } from "class-validator";
 
 export class CreateMesaDTO {
@@ -8,6 +8,6 @@ export class CreateMesaDTO {
     @IsString()
     cliente?: string;
 
-    @IsEnum(StatusMesa)
-    status?: StatusMesa;
+    @IsEnum(mesa_status)
+    status?: mesa_status;
 }

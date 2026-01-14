@@ -6,29 +6,29 @@ import { PrismaService } from "src/prisma/prisma.service";
 export class PedidosRepository {
     constructor(private prisma: PrismaService) { }
     
-    create(data: Prisma.PedidoCreateInput) {
+    create(data: Prisma.pedidoCreateInput) {
         return this.prisma.pedido.create({
             data,
-            include: { itens: true },
+            include: { itempedido: true },
         });
     }
 
     findAll() {
-        return this.prisma.pedido.findMany({ include: { itens: true } });
+        return this.prisma.pedido.findMany({ include: { itempedido: true } });
     }
 
     findById(id: number) {
         return this.prisma.pedido.findUnique({
             where: { id },
-            include: { itens: true },
+            include: { itempedido: true },
         });
     }
 
-    update(id: number, data: Prisma.PedidoUpdateInput) {
+    update(id: number, data: Prisma.pedidoUpdateInput) {
         return this.prisma.pedido.update({
             where: { id },
             data,
-            include: { itens: true },
+            include: { itempedido: true },
         });
     }
 

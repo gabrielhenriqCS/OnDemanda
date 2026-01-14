@@ -9,29 +9,24 @@ import {
   HttpStatus,
   UseGuards,
   Patch,
+  BadRequestException,
 } from '@nestjs/common';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoDTO } from './DTOs/create-pedido.dto';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from '@prisma/client';
-import { RolesGuard } from 'src/auth/roles.guard';
 import { UpdateStatusPedidoDTO } from './DTOs/update-status.dto';
 
-@UseGuards(RolesGuard)
 @Controller('pedidos')
 export class PedidosController {
   constructor(private readonly pedidosService: PedidosService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post('/criar')
-  @Roles(Role.ADMIN, Role.GARCOM, Role.ATENDENTE)
   create(@Body() data: CreatePedidoDTO) {
     return this.pedidosService.abrirPedido(data);
   }
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  @Roles(Role.ADMIN, Role.GARCOM, Role.ATENDENTE)
   findAll() {
     return this.pedidosService.mostrarPedidos();
   }
@@ -44,8 +39,10 @@ export class PedidosController {
 
   @HttpCode(HttpStatus.GONE)
   @Patch(':id/status')
-  @Roles(Role.ADMIN, Role.ATENDENTE)
-  update(@Param('id') id: string, @Body() data: UpdateStatusPedidoDTO) {
-    return this.pedidosService.atualizarStatus(+id, data.status);
+  update(@Param('id') id: string, @Body() dto: UpdateStatusPedidoDTO) {
+    if (!dto.status) {
+      throw new BadRequestException('Status é obrigatório!');
+    }
+    return this.pedidosService.atualizarStatus(+id, dto.status);
   }
 }

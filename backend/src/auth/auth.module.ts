@@ -4,32 +4,22 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsuariosModule } from 'src/usuarios/usuarios.module';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthGuard } from './auth.guard';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './roles.guard';
+import { Bcrypt } from './utils/bcrypt';
 
 @Module({
   imports: [
     UsuariosModule,
-    ConfigModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('SECRET_JWT'),
         signOptions: { expiresIn: '1h' },
       }),
-      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    RolesGuard,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
-  exports: [JwtModule]
+  providers: [AuthService, Bcrypt],
+  exports: [AuthService],
 })
 export class AuthModule {}

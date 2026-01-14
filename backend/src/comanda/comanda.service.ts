@@ -5,17 +5,18 @@ import {
 } from '@nestjs/common';
 import { CreateComandaDTO } from './DTOs/create-comanda.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { StatusComanda, StatusMesa } from '@prisma/client';
-
+import { comanda_status, mesa_status } from '@prisma/client';
 
 @Injectable()
 export class ComandaService {
   constructor(private prisma: PrismaService) {}
 
   async abrirComanda(dto: CreateComandaDTO) {
-    const mesa = await this.prisma.mesa.findUnique({ where: { id: dto.mesaId } });
+    const mesa = await this.prisma.mesa.findUnique({
+      where: { id: dto.mesaId },
+    });
     if (!mesa) throw new NotFoundException('Mesa não encontrada');
-    if (mesa.status === StatusMesa.OCUPADA) {
+    if (mesa.status === mesa_status.OCUPADA) {
       throw new BadRequestException('Mesa já está ocupada');
     }
 
@@ -24,30 +25,61 @@ export class ComandaService {
         data: {
           cliente: dto.cliente,
           mesa: { connect: { id: dto.mesaId } },
+          atualizadoEm: new Date(),
         },
       }),
       this.prisma.mesa.update({
         where: { id: dto.mesaId },
-        data: { status: StatusMesa.OCUPADA },
+        data: { status: mesa_status.OCUPADA },
       }),
     ]);
 
     return comanda;
   }
 
-  mostrarComandas() {
-    return this.prisma.comanda.findMany({
-      include: { mesa: true, pedidos: { include: { itens: { include: { produto: true } } } } },
+  async mostrarComandas() {
+    return await this.prisma.comanda.findMany({
+      include: {
+        mesa: true,
+        pedido: {
+          include: {
+            itempedido: {
+              include: {
+                produto: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   async encontrarComanda(id: number) {
     const comanda = await this.prisma.comanda.findUnique({
       where: { id },
-      include: { mesa: true, pedidos: { include: { itens: { include: { produto: true } } } } },
+      include: {
+        mesa: true,
+        pedido: {
+          include: {
+            itempedido: {
+              include: {
+                produto: true,
+              },
+            },
+          },
+        },
+      },
     });
     if (!comanda) throw new NotFoundException('Comanda não encontrada');
-    return comanda;
+    const total = comanda.pedido.reduce((acc, pedido) => {
+      const totalPedido = pedido.itempedido.reduce((sum, item) => sum + Number(item.precoTotal), 0);
+      return acc + totalPedido;
+    }, 0)
+
+    return {
+      ...comanda,
+      total: total
+    }
   }
 
   async fecharComanda(id: number) {
@@ -57,12 +89,20 @@ export class ComandaService {
       where: { comandaId: id, status: 'PREPARANDO' },
     });
     if (pendente > 0) {
-      throw new BadRequestException('Existem pedidos em preparo. Confirme antes de fechar.');
+      throw new BadRequestException(
+        'Existem pedidos em preparo. Confirme antes de fechar.',
+      );
     }
 
     await this.prisma.$transaction([
-      this.prisma.comanda.update({ where: { id }, data: { status: StatusComanda.FECHADA } }),
-      this.prisma.mesa.update({ where: { id: comanda.mesaId }, data: { status: StatusMesa.LIVRE } }),
+      this.prisma.comanda.update({
+        where: { id },
+        data: { status: comanda_status.FECHADA },
+      }),
+      this.prisma.mesa.update({
+        where: { id: comanda.mesaId },
+        data: { status: mesa_status.LIVRE },
+      }),
     ]);
 
     return { message: 'Comanda fechada e mesa liberada' };

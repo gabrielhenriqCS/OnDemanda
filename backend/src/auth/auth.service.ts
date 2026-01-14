@@ -1,43 +1,47 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsuariosService } from 'src/usuarios/usuarios.service';
-import * as bcrypt from 'bcrypt';
+import { Bcrypt } from './utils/bcrypt';
+import { LoginDTO } from './login.dto';
 @Injectable()
 export class AuthService {
   constructor(
     private usuarioService: UsuariosService,
     private jwtService: JwtService,
+    private bcrypt: Bcrypt,
   ) {}
 
-  async fazerLogin(
+  async validarUsuario(
     email: string,
     senha: string,
-    funcao: string,
-  ): Promise<{ token_acesso: string; funcao: string; email: string; id: number }> {
-    const usuario = await this.usuarioService.buscarPorEmail(email);
-    if (!usuario) {
-      throw new UnauthorizedException('Email inválido.');
+  ): Promise<any> {
+    const buscarUsuario = await this.usuarioService.buscarPorEmail(email);
+
+    if (!buscarUsuario)
+      throw new HttpException('Usuário não encontrado!', HttpStatus.NOT_FOUND);
+
+    const compararSenha = await this.bcrypt.compararSenhas(
+      senha,
+      buscarUsuario.senha,
+    );
+
+    if (buscarUsuario && compararSenha) {
+      const { senha, ...resposta } = buscarUsuario;
+      return resposta;
     }
 
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaCorreta) {
-      throw new UnauthorizedException('Senha inválida.');
-    }
+    throw new HttpException('Senha incorreta!', HttpStatus.UNAUTHORIZED);
+  }
 
-    if (usuario.funcao !== funcao) {
-      throw new UnauthorizedException('Função não está de acordo com as do usuário');
-    }
+  async login(login: LoginDTO) {
+    const buscaUsuario = await this.usuarioService.buscarPorEmail(login.email);
 
-    const payload = {
-      sub: usuario.id,
-      email: usuario.email,
-      funcao: usuario.funcao,
-    };
+    if (!buscaUsuario) throw new HttpException('Usuário não encontrado!', HttpStatus.UNAUTHORIZED)
+    
+    const payload = { sub: buscaUsuario.id, email: buscaUsuario.email }
+
     return {
-      token_acesso: await this.jwtService.signAsync(payload),
-      funcao: usuario.funcao,
-      email: usuario.email,
-      id: usuario.id
+      access_token: this.jwtService.sign(payload),
     };
   }
 }
