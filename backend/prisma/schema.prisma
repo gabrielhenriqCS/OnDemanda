@@ -5,6 +5,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -12,89 +13,80 @@ datasource db {
 }
 
 model Usuario {
-  id        String   @id @default(uuid())
+  id        Int           @id @default(autoincrement())
   nome      String
-  email     String   @unique
+  email     String        @unique
   senha     String
-  funcao    usuario_funcao
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Comanda {
-  id        String   @id @default(uuid())
-  cliente   String?
-  mesaId    String
-  status    comanda_status
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  mesa Mesa @relation(fields: [mesaId], references: [id], map: "fk_comanda_mesa")
-  pedido Pedido[]
-
+  funcao    FuncaoUsuario @default(GARCOM)
+  pedidos   Pedido[]
+  createdAt DateTime      @default(now())
 }
 
 model Mesa {
-  id        String   @id @default(uuid())
-  numero    Int      @unique
-  status    mesa_status
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int        @id @default(autoincrement())
+  mesa      String     @unique // Número ou Identificador da mesa
   cliente   String?
-  mesas     Int
-  comandas Comanda[]
+  status    StatusMesa @default(LIVRE)
+  comandas  Comanda[]
+}
+
+model Comanda {
+  id        Int           @id @default(autoincrement())
+  mesaId    Int
+  mesa      Mesa          @relation(fields: [mesaId], references: [id])
+  status    StatusComanda @default(ABERTA)
+  pedidos   Pedido[]
+  createdAt DateTime      @default(now())
+}
+
+model Item {
+  id          Int          @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  preco       Decimal      @db.Decimal(10, 2)
+  ativo       Boolean      @default(true)
+  itensPedido ItemPedido[]
 }
 
 model Pedido {
-  id           Int           @id @default(autoincrement())
-  comandaId    String
-  status       pedido_status @default(PREPARANDO)
-  criadoEm     DateTime      @default(now())
-  atualizadoEm DateTime
-  itempedido   Item_Pedido[]
-  comanda      Comanda       @relation(fields: [comandaId], references: [id], map: "Pedido_comandaId_fkey")
+  id          Int          @id @default(autoincrement())
+  comandaId   Int
+  comanda     Comanda      @relation(fields: [comandaId], references: [id])
+  usuarioId   Int
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id])
+  status      StatusPedido @default(PREPARANDO)
+  itens       ItemPedido[]
+  createdAt   DateTime     @default(now())
 }
 
-model Produto {
-  id           Int          @id @default(autoincrement())
-  nome         String
-  descricao    String?
-  preco        Float
-  categoria    String?
-  criadoEm     DateTime     @default(now())
-  atualizadoEm DateTime
-  itempedido   Item_Pedido[]
-}
-
-model Item_Pedido {
+model ItemPedido {
   id            Int     @id @default(autoincrement())
   pedidoId      Int
-  produtoId     Int
+  pedido        Pedido  @relation(fields: [pedidoId], references: [id])
+  itemId        Int
+  item          Item    @relation(fields: [itemId], references: [id])
   quantidade    Int
+  precoUnitario Decimal @db.Decimal(10, 2) 
   observacao    String?
-  precoUnitario Float
-  precoTotal    Float
-  pedido        Pedido  @relation(fields: [pedidoId], references: [id], map: "ItemPedido_pedidoId_fkey")
-  produto       Produto @relation(fields: [produtoId], references: [id], map: "ItemPedido_produtoId_fkey")
 }
 
-enum mesa_status {
+enum StatusMesa {
   OCUPADA
   LIVRE
 }
 
-enum pedido_status {
+enum StatusPedido {
   PREPARANDO
   PRONTO
   ENTREGUE
 }
 
-enum comanda_status {
+enum StatusComanda {
   ABERTA
   FECHADA
 }
 
-
-enum usuario_funcao {
+enum FuncaoUsuario {
   ADMIN
   GARCOM
   ATENDENTE

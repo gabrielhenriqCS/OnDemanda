@@ -3,30 +3,17 @@ import api from "../services/api";
 import { useNavigate } from "react-router";
 
 export default function Login() {
-  const [funcao, setFuncao] = useState("garcom");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [lembrarSenha, setLembrarSenha] = useState(false);
-  const [erro, setErro] = useState("");
+  const [erro,] = useState("");
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await api.post("/auth/login", { email, senha, funcao });
-
-      if (lembrarSenha) {
-        localStorage.setItem(
-          "dadosLogin",
-          JSON.stringify({ email, senha, funcao })
-        );
-      }
-
-      if (data.funcao.toLowerCase() !== funcao.toLowerCase()) {
-        setErro("Função selecionada não corresponde ao usuário.");
-        return;
-      }
+      const { data } = await api.post("/auth/login", { email, senha });
 
       localStorage.setItem("token", data.token_acesso);
 
@@ -38,25 +25,15 @@ export default function Login() {
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-blend-luminosity">
-      <h1 className="text-4xl text-center mb-5">OnComanda</h1>
+    <div className="p-8 rounded-2xl shadow-sm border border-zinc-300 w-full max-w-md bg-blend-luminosity">
+      <div>
+        <h1 className="text-2xl font-bold text-zinc-800">OnComanda</h1>
+        <p className="text-zinc-700 text-sm mt-1">Acessar o sistema de gestão</p>
+      </div>
       <form
-        className="flex flex-col px-24 py-32 bg-blue-300 rounded-md"
+        className="space-y-4"
         onSubmit={handleSubmit}
       >
-        <label htmlFor="funcao" className="text-[21px] my-2">
-          Função
-        </label>
-        <select
-          id="selectFuncao"
-          className="px-3 py-2 w-sm text-md rounded-md bg-white"
-          value={funcao}
-          onChange={(e) => setFuncao(e.target.value)}
-        >
-          <option value="garcom">Garçom</option>
-          <option value="cozinha">Cozinha</option>
-          <option value="admin">Administrador</option>
-        </select>
         <label htmlFor="email" className="text-[21px] my-2">
           E-mail
         </label>
@@ -84,13 +61,14 @@ export default function Login() {
             id="lembrarSenha"
             checked={lembrarSenha}
             onChange={(e) => setLembrarSenha(e.target.checked)}
+            className="w-4 h-4 accent-blue-500 border-5"
           />
-          <p>Lembrar-me</p>
+          <p className="text-[16px] font-semibold">Lembrar-me</p>
         </div>
 
         <button
           type="submit"
-          className="mt-12 py-2 px-0.5 bg-blue-700 text-white rounded-md hover:bg-blue-500 cursor-pointer"
+          className="mt-10 py-2 px-0.5 bg-blue-700 text-white rounded-md hover:bg-blue-500 cursor-pointer"
         >
           Entrar
         </button>

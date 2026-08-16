@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import prisma from '../lib/prisma';
+import {prisma} from '../helpers/prisma';
 
 export class AuthService {
   async login(email: string, senhaDigitada: string) {
@@ -8,11 +8,9 @@ export class AuthService {
 
     if (!usuario) throw new Error("Usuário não encontrado");
 
-    // Compara a senha digitada com o hash do banco (que criamos no seed)
     const senhaValida = await bcrypt.compare(senhaDigitada, usuario.senha);
     if (!senhaValida) throw new Error("Senha inválida");
 
-    // Gera o token com o ID e a Função (ADMIN, GARCOM, etc)
     const token = jwt.sign(
       { id: usuario.id, funcao: usuario.funcao },
       process.env.SECRET_JWT!,
