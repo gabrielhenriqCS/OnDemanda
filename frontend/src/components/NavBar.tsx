@@ -1,19 +1,19 @@
 export default function NavBar() {
   return (
-      <nav className="flex items-center px-6 py-3 bg-blue-300 text-[27px] font-semibold">
-      <div className="flex-2 text-left">OnComanda</div>
-      <ul className="flex flex-row list-none gap-14 justify-center w-1/3">
-        <li>
-          <a href="/comanda">Comanda</a>
-        </li>
-        <li>
-          <a href="/pedidos">Pedidos</a>
-        </li>
-        <li>
-          <a href="/cozinha">Cozinha</a>
-        </li>
-          </ul>
-          <div className="w-1/3"></div>
-    </nav>
+      <div className="flex items-center py-2 gap-8  text-[23px] font-semibold">
+      <span className="font-bold text-2xl ml-2">OnComanda</span>
+      <nav className="hidden md:flex gap-6 ">
+
+          <a href="/dashboard" className="font-medium hover:border-b-2 pb-1">Dashboard</a>
+        
+          <a href="/comanda" className="font-medium hover:border-b-2 pb-1">Comanda</a>
+        
+        
+          <a href="/pedidos" className="font-medium hover:border-b-2 pb-1">Pedidos</a>
+        
+          <a href="/cozinha" className="font-medium hover:border-b-2 pb-1">Cozinha</a>
+        
+          </nav>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:15
+    image: mysql
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -14,6 +14,6 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: "postgresql://postgres:1oncomandaproj@db:5432/on_comanda"
+      DATABASE_URL: "mysql://postgres:1oncomandaproj@db:5432/on_comanda"
     depends_on:
       - db

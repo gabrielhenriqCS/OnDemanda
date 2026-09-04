@@ -12,6 +12,6 @@ export interface ComandaDTO {
   cliente?: string;
   mesaId: number;
   status: 'ABERTA' | 'FECHADA';
-  criadoEm: string;
+  abertoEm: string;
   atualizadoEm: string;
 }

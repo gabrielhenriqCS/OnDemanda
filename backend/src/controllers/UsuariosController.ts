@@ -22,7 +22,9 @@ export class UsuariosController {
             const criarNovoUsuario = usuariosService.criarUsuario
             res.status(201).json({
                 status: 'success',
-                data: criarNovoUsuario
+                data: {
+                    criarNovoUsuario
+                }
             })
         } catch {
             res.status(500).json({message: 'Erro ao criar usuário'})

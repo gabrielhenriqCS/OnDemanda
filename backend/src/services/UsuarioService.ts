@@ -1,7 +1,7 @@
 import {
   AtualizarUsuarioDTO,
   CriarUsuarioDTO,
-} from "../models/Usuario";
+} from "../schemas/Usuario";
 
 import {prisma} from "../helpers/prisma";
 import bcrypt from "bcrypt";
