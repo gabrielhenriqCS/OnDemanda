@@ -57,6 +57,7 @@ model Pedido {
   status    StatusPedido @default(PREPARANDO)
   itens     ItemPedido[]
   createdAt DateTime     @default(now())
+  
 }
 
 model ItemPedido {

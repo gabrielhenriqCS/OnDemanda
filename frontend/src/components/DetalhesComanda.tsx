@@ -8,13 +8,24 @@ interface DetalhesComandaProps {
     onClose?: () => void
 }
 
+function formatarDataPedido(data: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(data));
+}
+
 export default function DetalhesComanda({mesa, onClose}: DetalhesComandaProps) {
     if (!mesa) return null
     const pedidosMock: PedidoDTO[] = [
     {
       id: 1,
       status: "ENTREGUE",
-      createdAt: "19:35",
+      createdAt: "2026-09-05T19:35:00",
       itens: [
         { id: 101, quantidade: 2, precoUnitario: 12.5, item: { nome: "Chopp 500ml" } },
         { id: 102, quantidade: 1, precoUnitario: 38.0, item: { nome: "Hambúrguer Artesanal" }, observacao: "Sem cebola" }
@@ -23,7 +34,7 @@ export default function DetalhesComanda({mesa, onClose}: DetalhesComandaProps) {
     {
       id: 2,
       status: "EM_PREPARO",
-      createdAt: "20:05",
+      createdAt: "2026-09-05T20:05:00",
       itens: [
         { id: 103, quantidade: 1, precoUnitario: 25.0, item: { nome: "Porção de Batata Frita" } }
       ]
@@ -65,7 +76,9 @@ export default function DetalhesComanda({mesa, onClose}: DetalhesComandaProps) {
           {pedidosMock.map((pedido) => (
             <div key={pedido.id} className="py-3 first:pt-0 last:pb-0">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-zinc-400">Pedido #{pedido.id} • {pedido.createdAt}</span>
+                <span className="text-xs text-zinc-400">
+                  Pedido #{pedido.id} • {formatarDataPedido(pedido.createdAt)}
+                </span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                   pedido.status === 'ENTREGUE' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                 }`}>

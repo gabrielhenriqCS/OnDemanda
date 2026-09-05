@@ -1,11 +1,10 @@
 import z from "zod";
 
-
-export const StatusComandaEnum = z.object(['ABERTA', 'FECHADA']);
+export const StatusComandaEnum = z.enum(["ABERTA", "FECHADA"]);
 
 export const ComandaSchema = z.object({
-    mesaId: z.string(),
-    cliente: z.string().optional(),
+  mesaId: z.number().int().positive(),
+  cliente: z.string().optional(),
 });
 
 export const atualizarStatusComandaSchema = z.object({
@@ -13,4 +12,6 @@ export const atualizarStatusComandaSchema = z.object({
 });
 
 export type CriarComandaDTO = z.infer<typeof ComandaSchema>;
-export type AtualizarStatusComandaDTO = z.infer<typeof atualizarStatusComandaSchema>;
+export type AtualizarStatusComandaDTO = z.infer<
+  typeof atualizarStatusComandaSchema
+>;

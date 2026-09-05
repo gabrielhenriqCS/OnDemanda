@@ -11,14 +11,14 @@ export class MesaService {
           select: { id: true, createdAt: true },
         },
       },
-      orderBy: { numero: "asc" },
+      orderBy: { mesa: "asc" },
     });
   }
 
   async criarMesa(dados: CriarMesaDTO) {
     const mesaExiste = await prisma.mesa.findUnique({
       where: {
-        numero: dados.mesa,
+        mesa: dados.mesa,
       },
     });
 
@@ -35,10 +35,10 @@ export class MesaService {
     });
   }
 
-  async alterarMesa(id: string, dados: AtualizarMesaDTO) {
+  async alterarMesa(id: number, dados: AtualizarMesaDTO) {
     const mesa = await prisma.mesa.findUnique({
       where: {
-        id
+        id: id,
       },
     });
 

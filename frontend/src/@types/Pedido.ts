@@ -10,7 +10,7 @@ export interface ItemPedidoDTO {
 
 export interface PedidoDTO {
   id: number;
-  status: 'PENDENTE' | 'EM_PREPARO' | 'ENTREGUE' | 'CANCELADO';
+  status: 'PREPARANDO' | 'PRONTO' | 'ENTREGUE' | 'CANCELADO';
   createdAt: string;
   itens: ItemPedidoDTO[];
 }
